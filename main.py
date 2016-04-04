@@ -185,7 +185,10 @@ def record():
         elif error == 3:
             return render_template("header.html", randBackground=randBG()) + render_template("panel_outreachMissing.html", firstName=fn, lastName=ln, attnPercentage=attnPercentage) + render_template("reminderPanel.html", attendancePanelContent=getAttendancePanelContent(), outreachPanelContent=getOutreachPanelContent()) + render_template("endScripts.html") + render_template("calendarData.html", calendarJSON=attendanceJSON) + render_template("footer.html", fnTypeaheadJSON=jsonifyFN(), lnTypeaheadJSON=jsonifyLN())
         else:
-            return '''Internal Server Error. Please send the url to Jeremy Zhang <a href="mailto:s-zhangje@bsd405.org">via e-mail</a>. Thanks!"'''
+            return render_template("header.html", randBackground=randBG()) + render_template("panel_bothMissing.html", firstName=fn, lastName=ln) + render_template("reminderPanel.html", attendancePanelContent=getAttendancePanelContent(), outreachPanelContent=getOutreachPanelContent()) + render_template("endScripts.html") + render_template("footer.html", fnTypeaheadJSON=jsonifyFN(), lnTypeaheadJSON=jsonifyLN())
+    else:
+        return render_template("header.html", randBackground=randBG()) + render_template("panel_bothMissing.html", firstName=fn, lastName=ln) + render_template("reminderPanel.html", attendancePanelContent=getAttendancePanelContent(), outreachPanelContent=getOutreachPanelContent()) + render_template("endScripts.html") + render_template("footer.html", fnTypeaheadJSON=jsonifyFN(), lnTypeaheadJSON=jsonifyLN())
+    return render_template("header.html", randBackground=randBG()) + render_template("panel_bothMissing.html", firstName=fn, lastName=ln) + render_template("reminderPanel.html", attendancePanelContent=getAttendancePanelContent(), outreachPanelContent=getOutreachPanelContent()) + render_template("endScripts.html") + render_template("footer.html", fnTypeaheadJSON=jsonifyFN(), lnTypeaheadJSON=jsonifyLN())
 
 ### DOWNLOAD CSVS ###
 @app.route('/csv/<filename>')
@@ -219,12 +222,10 @@ google = oauth.remote_app('google',
                           access_token_params={'grant_type': 'authorization_code'},
                           consumer_key=GOOGLE_CLIENT_ID,
                           consumer_secret=GOOGLE_CLIENT_SECRET)
-
-@app.route('/admin')
-def admin():
+def loggedInCheck():
     access_token = session.get('access_token')
     if access_token is None:
-        return redirect(url_for('login'))
+        return False
 
     access_token = access_token[0]
     from urllib2 import Request, urlopen, URLError
@@ -238,15 +239,50 @@ def admin():
         if e.code == 401:
             # Unauthorized - bad token
             session.pop('access_token', None)
-            return redirect(url_for('login'))
+            return False
     loginStr = res.read()
     loginStr = json.loads(loginStr)
     with open(os.path.dirname(os.path.realpath(__file__)) + "/" + "admins.txt") as f:
         adminEmails = f.read().splitlines()
     if loginStr['email'] in adminEmails:
-        return render_template("adminPanel.html", adminEmail=loginStr['email'])
+        return True
     else:
-        return redirect(url_for('logout'))
+        return False
+
+def getAdminEmail():
+    access_token = session.get('access_token')
+    if access_token is None:
+        return "null"
+
+    access_token = access_token[0]
+    from urllib2 import Request, urlopen, URLError
+
+    headers = {'Authorization': 'OAuth '+access_token}
+    req = Request('https://www.googleapis.com/oauth2/v1/userinfo',
+                  None, headers)
+    try:
+        res = urlopen(req)
+    except URLError, e:
+        if e.code == 401:
+            # Unauthorized - bad token
+            session.pop('access_token', None)
+            return "null"
+    loginStr = res.read()
+    loginStr = json.loads(loginStr)
+    with open(os.path.dirname(os.path.realpath(__file__)) + "/" + "admins.txt") as f:
+        adminEmails = f.read().splitlines()
+    if loginStr['email'] in adminEmails:
+        return str(loginStr['email'])
+    else:
+        return "null"
+
+@app.route('/admin')
+def admin():
+    loggedIn = loggedInCheck()
+    if loggedIn:
+        return render_template("adminPanel.html", adminEmail=getAdminEmail())
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/login')
 def login():
@@ -290,49 +326,29 @@ def excel2csvAttendance(fileName):
 
 @app.route('/uploadAttendance', methods=['GET', 'POST'])
 def uploadAttendance():
-        access_token = session.get('access_token')
-        if access_token is None:
-            return redirect(url_for('login'))
-
-        access_token = access_token[0]
-        from urllib2 import Request, urlopen, URLError
-
-        headers = {'Authorization': 'OAuth '+access_token}
-        req = Request('https://www.googleapis.com/oauth2/v1/userinfo',
-                      None, headers)
-        try:
-            res = urlopen(req)
-        except URLError, e:
-            if e.code == 401:
-                # Unauthorized - bad token
-                session.pop('access_token', None)
-                return redirect(url_for('login'))
-        loginStr = res.read()
-        loginStr = json.loads(loginStr)
-        with open(os.path.dirname(os.path.realpath(__file__)) + "/" + "admins.txt") as f:
-            adminEmails = f.read().splitlines()
-        if loginStr['email'] in adminEmails:
-            if request.method == 'POST':
-                afile = request.files['file']
-                if afile and allowed_file(afile.filename):
-                    filename = secure_filename(afile.filename)
-                    afile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                    if filename[len(filename)-3:] == "csv":
-                        move(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + filename, os.path.dirname(os.path.realpath(__file__)) + "/csv/nrgAttendance.csv")
-                        flash(u'Successfully uploaded a CSV file!', 'success')
-                    else:
-                        try:
-                            os.remove(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + "nrgAttendance.csv")
-                        except:
-                            pass
-                        excel2csvAttendance(filename)
-                        os.remove(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + filename)
-                        flash(u'Successfully uploaded a Microsoft Excel file!', 'success')
+    loggedIn = loggedInCheck()
+    if loggedIn:
+        if request.method == 'POST':
+            afile = request.files['file']
+            if afile and allowed_file(afile.filename):
+                filename = secure_filename(afile.filename)
+                afile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                if filename[len(filename)-3:] == "csv":
+                    move(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + filename, os.path.dirname(os.path.realpath(__file__)) + "/csv/nrgAttendance.csv")
+                    flash(u'Successfully uploaded a CSV file!', 'success')
                 else:
-                    flash(u'Only .csv, .xls, and .xlsx are accepted!', 'danger')
-            return render_template('uploadAttendance.html', adminEmail=str(loginStr['email']))
-        else:
-            return redirect(url_for('logout'))
+                    try:
+                        os.remove(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + "nrgAttendance.csv")
+                    except:
+                        pass
+                    excel2csvAttendance(filename)
+                    os.remove(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + filename)
+                    flash(u'Successfully uploaded a Microsoft Excel file!', 'success')
+            else:
+                flash(u'Only .csv, .xls, and .xlsx are accepted!', 'danger')
+        return render_template('uploadAttendance.html', adminEmail=str(getAdminEmail()))
+    else:
+        return redirect(url_for('logout'))
 
 def excel2csvOutreach(fileName):
     wb = xlrd.open_workbook(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + fileName)
@@ -345,149 +361,69 @@ def excel2csvOutreach(fileName):
 
 @app.route('/uploadOutreach', methods=['GET', 'POST'])
 def uploadOutreach():
-        access_token = session.get('access_token')
-        if access_token is None:
-            return redirect(url_for('login'))
-
-        access_token = access_token[0]
-        from urllib2 import Request, urlopen, URLError
-
-        headers = {'Authorization': 'OAuth '+access_token}
-        req = Request('https://www.googleapis.com/oauth2/v1/userinfo',
-                      None, headers)
-        try:
-            res = urlopen(req)
-        except URLError, e:
-            if e.code == 401:
-                # Unauthorized - bad token
-                session.pop('access_token', None)
-                return redirect(url_for('login'))
-        loginStr = res.read()
-        loginStr = json.loads(loginStr)
-        with open(os.path.dirname(os.path.realpath(__file__)) + "/" + "admins.txt") as f:
-            adminEmails = f.read().splitlines()
-        if loginStr['email'] in adminEmails:
-            if request.method == 'POST':
-                afile = request.files['file']
-                if afile and allowed_file(afile.filename):
-                    filename = secure_filename(afile.filename)
-                    afile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                    if filename[len(filename)-3:] == "csv":
-                        move(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + filename, os.path.dirname(os.path.realpath(__file__)) + "/csv/nrgOutreach.csv")
-                        flash(u'Successfully uploaded a CSV file!', 'success')
-                    else:
-                        try:
-                            os.remove(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + "nrgOutreach.csv")
-                        except:
-                            pass
-                        excel2csvOutreach(filename)
-                        os.remove(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + filename)
-                        flash(u'Successfully uploaded a Microsoft Excel file!', 'success')
+    loggedIn = loggedInCheck()
+    if loggedIn:
+        if request.method == 'POST':
+            afile = request.files['file']
+            if afile and allowed_file(afile.filename):
+                filename = secure_filename(afile.filename)
+                afile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                if filename[len(filename)-3:] == "csv":
+                    move(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + filename, os.path.dirname(os.path.realpath(__file__)) + "/csv/nrgOutreach.csv")
+                    flash(u'Successfully uploaded a CSV file!', 'success')
                 else:
-                    flash(u'Only .csv, .xls, and .xlsx are accepted!', 'danger')
-            return render_template('uploadOutreach.html', adminEmail=str(loginStr['email']))
-        else:
-            return redirect(url_for('logout'))
+                    try:
+                        os.remove(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + "nrgOutreach.csv")
+                    except:
+                        pass
+                    excel2csvOutreach(filename)
+                    os.remove(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + filename)
+                    flash(u'Successfully uploaded a Microsoft Excel file!', 'success')
+            else:
+                flash(u'Only .csv, .xls, and .xlsx are accepted!', 'danger')
+        return render_template('uploadOutreach.html', adminEmail=getAdminEmail())
+    else:
+        return redirect(url_for('logout'))
 
 @app.route('/editAttendancePanel', methods=['GET','POST'])
 def editAttendancePanel():
-    access_token = session.get('access_token')
-    if access_token is None:
-        return redirect(url_for('login'))
-
-    access_token = access_token[0]
-    from urllib2 import Request, urlopen, URLError
-
-    headers = {'Authorization': 'OAuth '+access_token}
-    req = Request('https://www.googleapis.com/oauth2/v1/userinfo',
-                  None, headers)
-    try:
-        res = urlopen(req)
-    except URLError, e:
-        if e.code == 401:
-            # Unauthorized - bad token
-            session.pop('access_token', None)
-            return redirect(url_for('login'))
-    loginStr = res.read()
-    loginStr = json.loads(loginStr)
-    with open(os.path.dirname(os.path.realpath(__file__)) + "/" + "admins.txt") as f:
-        adminEmails = f.read().splitlines()
-    if loginStr['email'] in adminEmails:
+    loggedIn = loggedInCheck()
+    if loggedIn:
         if request.method == 'POST':
             boxContent = request.form['textContent']
             fo = open(os.path.dirname(os.path.realpath(__file__)) + "/" + "panelContent/attendancePanel.txt", "wb")
             fo.write(boxContent);
             flash(u'Successfully updated attendance panel!', 'success')
             return redirect(url_for('editAttendancePanel'))
-        return render_template("editAttendancePanel.html", adminEmail=loginStr['email'], prefilledContent=file_get_contents("panelContent/attendancePanel.txt"))
+        return render_template("editAttendancePanel.html", adminEmail=getAdminEmail(), prefilledContent=file_get_contents("panelContent/attendancePanel.txt"))
     else:
         return redirect(url_for('logout'))
 
 @app.route('/editOutreachPanel', methods=['GET','POST'])
 def editOutreachPanel():
-    access_token = session.get('access_token')
-    if access_token is None:
-        return redirect(url_for('login'))
-
-    access_token = access_token[0]
-    from urllib2 import Request, urlopen, URLError
-
-    headers = {'Authorization': 'OAuth '+access_token}
-    req = Request('https://www.googleapis.com/oauth2/v1/userinfo',
-                  None, headers)
-    try:
-        res = urlopen(req)
-    except URLError, e:
-        if e.code == 401:
-            # Unauthorized - bad token
-            session.pop('access_token', None)
-            return redirect(url_for('login'))
-    loginStr = res.read()
-    loginStr = json.loads(loginStr)
-    with open(os.path.dirname(os.path.realpath(__file__)) + "/" + "admins.txt") as f:
-        adminEmails = f.read().splitlines()
-    if loginStr['email'] in adminEmails:
+    loggedIn = loggedInCheck()
+    if loggedIn:
         if request.method == 'POST':
             boxContent = request.form['textContent']
             fo = open(os.path.dirname(os.path.realpath(__file__)) + "/" + "panelContent/outreachPanel.txt", "wb")
             fo.write(boxContent);
             flash(u'Successfully updated outreach panel!', 'success')
             return redirect(url_for('editOutreachPanel'))
-        return render_template("editOutreachPanel.html", adminEmail=loginStr['email'], prefilledContent=file_get_contents("panelContent/outreachPanel.txt"))
+        return render_template("editOutreachPanel.html", adminEmail=getAdminEmail(), prefilledContent=file_get_contents("panelContent/outreachPanel.txt"))
     else:
         return redirect(url_for('logout'))
 
 @app.route('/editAdmins', methods=['GET','POST'])
 def editAdmins():
-    access_token = session.get('access_token')
-    if access_token is None:
-        return redirect(url_for('login'))
-
-    access_token = access_token[0]
-    from urllib2 import Request, urlopen, URLError
-
-    headers = {'Authorization': 'OAuth '+access_token}
-    req = Request('https://www.googleapis.com/oauth2/v1/userinfo',
-                  None, headers)
-    try:
-        res = urlopen(req)
-    except URLError, e:
-        if e.code == 401:
-            # Unauthorized - bad token
-            session.pop('access_token', None)
-            return redirect(url_for('login'))
-    loginStr = res.read()
-    loginStr = json.loads(loginStr)
-    with open(os.path.dirname(os.path.realpath(__file__)) + "/" + "admins.txt") as f:
-        adminEmails = f.read().splitlines()
-    if loginStr['email'] in adminEmails:
+    loggedIn = loggedInCheck()
+    if loggedIn:
         if request.method == 'POST':
             boxContent = request.form['textContent']
             fo = open(os.path.dirname(os.path.realpath(__file__)) + "/" + "admins.txt", "wb")
             fo.write(boxContent);
             flash(u'Successfully updated admins list!', 'success')
             return redirect(url_for('editAdmins'))
-        return render_template("editAdmins.html", adminEmail=loginStr['email'], prefilledContent=file_get_contents("admins.txt"))
+        return render_template("editAdmins.html", adminEmail=getAdminEmail(), prefilledContent=file_get_contents("admins.txt"))
     else:
         return redirect(url_for('logout'))
 
