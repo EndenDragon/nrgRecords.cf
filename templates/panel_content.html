@@ -1,0 +1,58 @@
+<div class="col-md-8">
+<form action="record" method="get" id="nameForm">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Record Lookup</h3>
+            <div class="pull-right" style="position: relative; top: -20px;"><a href="/"><button type="button" class="btn btn-danger btn-xs">Clear</button></a></div>
+        </div>
+        <div class="panel-body">
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon" id="sizing-addon1"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></span>
+                <input type="text" class="form-control" placeholder="First Name" aria-describedby="sizing-addon1" name="fn" id="fn" data-provide="typeahead" autocomplete="off" required>
+                <input type="text" class="form-control" placeholder="Last Name" aria-describedby="sizing-addon1" name="ln" id="ln" data-provide="typeahead" autocomplete="off" required>
+                <span class="input-group-addon">
+                    <button class="btn btn-default btn-large" type="button submit" value="Submit">Submit <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+                </span>
+            </div>
+        </div>
+            <div class="well well-sm" style="color: #333;">
+                <center><h2><b>{{ firstName }} {{ lastName }}'s Records</b><br></h2></center>
+
+                <center><b><h3 style="font-weight: bold;">~Attendance~</h3></b></center>
+                <div class="well well-sm" style="background-color: #EAEAEA;">
+                <!-- Responsive calendar - START -->
+                  <div class="responsive-calendar" style="color: black;">
+                  <div class="controls">
+                      <a class="pull-left" data-go="prev"><div class="btn btn-primary btn-lg">Prev</div></a>
+                      <h4><span data-head-month></span> <span data-head-year></span></h4>
+                      <a class="pull-right" data-go="next"><div class="btn btn-primary btn-lg">Next</div></a>
+                  </div><hr/>
+                  <div class="day-headers">
+                    <div class="day header">Sun</div>
+                    <div class="day header">Mon</div>
+                    <div class="day header">Tue</div>
+                    <div class="day header">Wed</div>
+                    <div class="day header">Thu</div>
+                    <div class="day header">Fri</div>
+                    <div class="day header">Sat</div>
+                  </div>
+                  <div class="days" data-group="days">
+                  </div>
+                </div>
+                <!-- Responsive calendar - END -->
+                <p style="color: darkgrey;"><i>Dates that are highlighted and have a number are the ones you have attended.</i></p>
+                <hr>
+                <h4 style="color: black;"><strong>Percentage of attendance: {{attnPercentage}}%</strong></h4>
+              </div>
+              <br>
+                <center><b><h3 style="font-weight: bold;">~Outreach~</h3></b></center>
+                <div class="well well-sm" style="background-color: #EAEAEA;">
+                  <p>
+                      {{ outreachData|safe }}
+                  </p>
+              </div>
+             </div>
+
+    </div>
+</form>
+</div>

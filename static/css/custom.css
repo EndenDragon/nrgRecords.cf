@@ -1,0 +1,49 @@
+.navbar {
+    background-color: #400707;
+    border-color: #400707;
+}
+.btn-xlarge {
+    padding: 18px 28px;
+    font-size: 22px; //change this to your desired size
+    line-height: normal;
+    -webkit-border-radius: 8px;
+       -moz-border-radius: 8px;
+            border-radius: 8px;
+}
+.right .github-fork-ribbon {
+    background-color: #f80;
+}
+.bodyGradient {
+  background: linear-gradient(to bottom, rgba(236, 60, 60, 0.5) 0%, rgba(216, 23, 23, 0.98) 100%);
+}
+body {
+    background-color: #D81717;
+    color: #FFEC00;
+    min-height: 100%;
+}
+html {
+	min-height: 100%;
+}
+body {
+	margin: 0;
+	height: 100%;
+}
+/* unvisited link */
+a.yellowLink:link {
+    color: yellow;
+}
+
+/* visited link */
+a.yellowLink:visited {
+    color: yellow;
+}
+
+/* mouse over link */
+a.yellowLink:hover {
+    color: lightyellow;
+}
+
+/* selected link */
+a.yellowLink:active {
+    color: darkyellow;
+}

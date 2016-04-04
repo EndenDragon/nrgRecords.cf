@@ -1,0 +1,35 @@
+<!-- First Names typeahead -->
+<script>
+    var jsonString = '{{ fnTypeaheadJSON|safe }}';
+
+    var jsonObj = $.parseJSON(jsonString);
+    var sourceArr = [];
+
+    for (var i = 0; i < jsonObj.length; i++) {
+       sourceArr.push(jsonObj[i].label);
+    }
+
+    $("#fn").typeahead({
+       source: sourceArr
+    });
+</script>
+
+<!-- Last Names typeahead -->
+<script>
+    var jsonString = '{{ lnTypeaheadJSON|safe }}';
+
+    var jsonObj = $.parseJSON(jsonString);
+    var sourceArr = [];
+
+    for (var i = 0; i < jsonObj.length; i++) {
+       sourceArr.push(jsonObj[i].label);
+    }
+
+    $("#ln").typeahead({
+       source: sourceArr
+    });
+</script>
+
+</body>
+
+</html>

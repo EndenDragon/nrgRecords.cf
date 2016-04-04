@@ -1,0 +1,9 @@
+<!-- Calendar Data -->
+<script type="text/javascript">
+  $(document).ready(function () {
+    $(".responsive-calendar").responsiveCalendar({
+      startFromSunday: true,
+      events: {{ calendarJSON|safe }}
+    });
+  });
+</script>
