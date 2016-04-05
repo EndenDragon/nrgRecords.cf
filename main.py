@@ -196,6 +196,15 @@ def download_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename, as_attachment=True)
 
+### OUTPUT LOG ###
+@app.route('/log')
+def log():
+    app_config = file_get_contents("config.json")
+    app_config = json.loads(app_config)
+    try:
+        return file_get_contents(app_config['log'])
+    except:
+        return "Sorry, Log file cannot be found"
 
 ### ADMIN PANEL ###
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__)) + "/" + "csv"

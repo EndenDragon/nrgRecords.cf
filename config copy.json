@@ -2,6 +2,7 @@
   "ip": "0.0.0.0",
   "port": "5000",
   "debug": "True",
+  "log": "file.log",
   "gClientID": "GOOGLE OAUTH CLIENT ID",
   "gClientSecret": "GOOGLE OAUTH CLIENT SECRET"
 }
