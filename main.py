@@ -202,7 +202,7 @@ def log():
     app_config = file_get_contents("config.json")
     app_config = json.loads(app_config)
     try:
-        return file_get_contents(app_config['log'])
+        return "<textarea style="width:100%; height:100vh;" disabled>" + file_get_contents(app_config['log']) + "</textarea>"
     except:
         return "Sorry, Log file cannot be found"
 
