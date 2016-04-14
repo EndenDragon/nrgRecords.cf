@@ -4,7 +4,7 @@
 
 Newport Robotics Group (NRG948) Records Site
 
-The site's purpose is to quickly look up one's attendance and outreach hours.
+The site's purpose is to quickly look up one's attendance and outreach hours. Built onto the Flask microframework above python, it provides a great base to create a simple website. The deployed server uses wsgi gunicorn to create workers (3) to divide up the work and speed up the page loads.
 
 Make any changes/fixes that are needed and submit a pull-request! Thank you for your contribution! :)
 
@@ -26,6 +26,7 @@ Make any changes/fixes that are needed and submit a pull-request! Thank you for 
 * /panelContent/ - Where content for the panels are located and used by the program
 * admins.txt - Seperated by line breaks, this file contains email addresses for logging into the admin panel
 * config.json - Configuration file for ip, port, debug state, google client id, google client secret
+* globalHeaderMSG.json - The global header JSON file stores the message to be displayed globally. It also saves the state (enabled/disabled) and category (color effect) of the global header.
 
 ## URL Format
 
