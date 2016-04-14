@@ -113,7 +113,10 @@ def jsonifyLN():
 
 @app.route("/")
 def index():
-    oldRef = remove_html_tags(request.args.get('oldRef', None))
+    try:
+        oldRef = remove_html_tags(request.args.get('oldRef', None))
+    except:
+        oldRef = None
     if not oldRef == None:
         flash(u'''It appears that you have been redirected from our old domain (''' + oldRef + '''). Please update your bookmarks to the new domain (<a href="http://nrgRecords.cf/">http://nrgRecords.cf/</a>). Thanks!''', 'warning')
     flashcfg = file_get_contents("globalHeaderMSG.json")
