@@ -34,6 +34,14 @@ def randBG():
              if not filename.endswith(".bak")]
     return random.choice(files)[len(filepath)+1:]
 
+def remove_extra_spaces(data):
+    p = re.compile(r'\s+')
+    return p.sub(' ', data)
+
+def remove_html_tags(data):
+    p = re.compile(r'<.*?>')
+    return remove_extra_spaces(p.sub('', data))
+
 def getAttendancePanelContent():
     return file_get_contents("panelContent/attendancePanel.txt")
 
@@ -104,7 +112,7 @@ def jsonifyLN():
 
 @app.route("/")
 def index():
-    oldRef = request.args.get('oldRef', None)
+    oldRef = remove_html_tags(request.args.get('oldRef', None))
     if not oldRef == None:
         flash(u'''It appears that you have been redirected from our old domain (''' + oldRef + '''). Please update your bookmarks to the new domain (<a href="http://nrgRecords.cf/">http://nrgRecords.cf/</a>). Thanks!''', 'warning')
     flashcfg = file_get_contents("globalHeaderMSG.json")
