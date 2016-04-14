@@ -59,11 +59,11 @@
                 <ul class="nav">
                     <!-- Main menu -->
                     <li><a href="admin"><i class="glyphicon glyphicon-home"></i> Dashboard</a></li>
-                    <li class="current"><a href="uploadAttendance"><i class="glyphicon glyphicon-calendar"></i> Upload Attendance</a></li>
+                    <li><a href="uploadAttendance"><i class="glyphicon glyphicon-calendar"></i> Upload Attendance</a></li>
                     <li><a href="uploadOutreach"><i class="glyphicon glyphicon-stats"></i> Upload Outreach</a></li>
                     <li><a href="editAttendancePanel"><i class="glyphicon glyphicon-list"></i> Edit Attendance Panel</a></li>
                     <li><a href="editOutreachPanel"><i class="glyphicon glyphicon-record"></i> Edit Outreach Panel</a></li>
-                    <li><a href="editGlobalMSG"><i class="glyphicon glyphicon-comment"></i> Edit Global Header Message</a></li>
+                    <li class="current"><a href="editGlobalMSG"><i class="glyphicon glyphicon-comment"></i> Edit Global Header Message</a></li>
                     <li><a href="editAdmins"><i class="glyphicon glyphicon-pencil"></i> Add/Remove Admins</a></li>
                 </ul>
              </div>
@@ -73,7 +73,7 @@
         <div class="row">
           <div class="col-md-12 panel-info">
             <div class="content-box-header panel-heading">
-              <div class="panel-title ">Upload Attendance</div>
+              <div class="panel-title ">Edit Global Header Messages</div>
 
             </div>
             <div class="content-box-large box-with-header">
@@ -87,12 +87,58 @@
 
 
               <form action="" method=post enctype=multipart/form-data>
-                <p><input type=file name=file>
-                   <input type=submit value=Upload>
+                <span>Toggle Global Header Message</span>
+                <label class="radio-inline">
+                  {% if fstate %}
+                  <input type="radio" name="enabled" value="True" checked> Enabled
+                  {% else %}
+                  <input type="radio" name="enabled" value="True"> Enabled
+                  {% endif %}
+                </label>
+                <label class="radio-inline">
+                  {% if not fstate %}
+                  <input type="radio" name="enabled" value="False" checked> Disabled
+                  {% else %}
+                  <input type="radio" name="enabled" value="False"> Disabled
+                  {% endif %}
+                </label>
+
+                <br>
+                <br>
+                <span>Select label</span>
+                <select name="category">
+                  {% if fcategory == "success" %}
+                  <option value="success" selected>Success (green)</option>
+                  {% else %}
+                  <option value="success" selected>Success (green)</option>
+                  {% endif %}
+
+                  {% if fcategory == "info" %}
+                  <option value="info" selected>Info (blue)</option>
+                  {% else %}
+                  <option value="info">Info (blue)</option>
+                  {% endif %}
+
+                  {% if fcategory == "warning" %}
+                  <option value="warning" selected>Warning (yellow)</option>
+                  {% else %}
+                  <option value="warning">Warning (yellow)</option>
+                  {% endif %}
+
+                  {% if fcategory == "danger" %}
+                  <option value="danger" selected>Danger (red)</option>
+                  {% else %}
+                  <option value="danger">Danger (red)</option>
+                  {% endif %}
+                </select>
+
+                <br>
+                <br>
+                <textarea class="form-control" rows="2" name="message">{{ fmessage|safe }}</textarea>
+                <input type="submit">
               </form>
-            <br /><br />
-            <p>*Only .csv, .xlsx, and .xls files are supported. Other files will be rejected.</p>
-            <p><a href="csv/nrgAttendance.csv">Download the current attendance csv file.</a></p>
+              <br>
+              <p>*HTML is enabled. But please keep the output one line only.</p>
           </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify
 from werkzeug import secure_filename
 from flask_oauth import OAuth
 import os
@@ -104,10 +104,22 @@ def jsonifyLN():
 
 @app.route("/")
 def index():
+    oldRef = request.args.get('oldRef', None)
+    if not oldRef == None:
+        flash(u'''It appears that you have been redirected from our old domain (''' + oldRef + '''). Please update your bookmarks to the new domain (<a href="http://nrgRecords.cf/">http://nrgRecords.cf/</a>). Thanks!''', 'warning')
+    flashcfg = file_get_contents("globalHeaderMSG.json")
+    flashcfg = json.loads(flashcfg)
+    if flashcfg['enabled']:
+        flash(flashcfg['message'], flashcfg['category'])
     return render_template("header.html", randBackground=randBG()) + render_template("panel_empty.html") + render_template("reminderPanel.html", attendancePanelContent=getAttendancePanelContent(), outreachPanelContent=getOutreachPanelContent()) + render_template("endScripts.html") + render_template("footer.html", fnTypeaheadJSON=jsonifyFN(), lnTypeaheadJSON=jsonifyLN())
 
 @app.route("/record")
 def record():
+    flashcfg = file_get_contents("globalHeaderMSG.json")
+    flashcfg = json.loads(flashcfg)
+    if flashcfg['enabled']:
+        flash(flashcfg['message'], flashcfg['category'])
+
     fn = request.args.get('fn', 'null')
     ln = request.args.get('ln', 'null')
     #0 = Both Attendance & Outreach works
@@ -433,6 +445,30 @@ def editAdmins():
             flash(u'Successfully updated admins list!', 'success')
             return redirect(url_for('editAdmins'))
         return render_template("editAdmins.html", adminEmail=getAdminEmail(), prefilledContent=file_get_contents("admins.txt"))
+    else:
+        return redirect(url_for('logout'))
+
+@app.route('/editGlobalMSG', methods=['GET','POST'])
+def editGlobalMSG():
+    loggedIn = loggedInCheck()
+    if loggedIn:
+        if request.method == 'POST':
+            fstate = request.form['enabled'] == 'True'
+            fcategory = request.form['category']
+            fmessage = request.form['message']
+            with open(os.path.dirname(os.path.realpath(__file__)) + "/" + "globalHeaderMSG.json", 'r+') as f:
+                json_data = json.load(f)
+                json_data['enabled'] = fstate
+                json_data['category'] = fcategory
+                json_data['message'] = fmessage
+                f.seek(0)
+                f.write(json.dumps(json_data))
+                f.truncate()
+            flash(u'Successfully updated global header message!', 'success')
+            return redirect(url_for('editGlobalMSG'))
+        globalMSGDef = file_get_contents("globalHeaderMSG.json")
+        globalMSGDef = json.loads(globalMSGDef)
+        return render_template("editGlobalMSG.html", adminEmail=getAdminEmail(), fstate=globalMSGDef['enabled'], fcategory=globalMSGDef['category'], fmessage=globalMSGDef['message'])
     else:
         return redirect(url_for('logout'))
 
