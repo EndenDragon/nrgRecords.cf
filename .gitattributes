@@ -1,1 +1,2 @@
 templates/*.html linguist-language=Python
+static/js/coffee/responsive-calendar.coffee linguist-vendored=false
