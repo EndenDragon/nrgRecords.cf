@@ -9,7 +9,6 @@ import xlrd
 import time
 import hmac
 import hashlib
-import subprocess
 import re
 from shutil import move
 from flask.ext.compress import Compress
@@ -496,21 +495,6 @@ def editGlobalMSG():
         return render_template("editGlobalMSG.html", adminEmail=getAdminEmail(), fstate=globalMSGDef['enabled'], fcategory=globalMSGDef['category'], fmessage=globalMSGDef['message'])
     else:
         return redirect(url_for('logout'))
-
-#Github Webhook Push Event
-@app.route("/github-update", methods=["POST"])
-def github_update():
-    app_config = file_get_contents("config.json")
-    app_config = json.loads(app_config)
-    h = hmac.new(str(app_config["githubWebhookSecret"]), request.get_data(), hashlib.sha1)
-    if h.hexdigest() != request.headers.get("X-Hub-Signature", "")[5:]:  # A timing attack here is nearly impossible.
-        return "FAIL"
-    try:
-        subprocess.call('updatenrgrecords', shell=True)
-    except Exception as e:
-        print e
-        return "ERROR", 500
-    return "OK"
 
 if __name__ == "__main__":
     app_config = file_get_contents("config.json")
