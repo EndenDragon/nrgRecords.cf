@@ -9,6 +9,7 @@ import xlrd
 import time
 import hmac
 import hashlib
+import subprocess
 import re
 from shutil import move
 from flask.ext.compress import Compress
