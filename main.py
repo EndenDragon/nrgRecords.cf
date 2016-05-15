@@ -7,8 +7,19 @@ import csv
 import json
 import xlrd
 import time
+import hmac
+import hashlib
 from shutil import move
-app = Flask(__name__)
+from flask.ext.compress import Compress
+
+compress = Compress()
+
+def start_app():
+    app = Flask(__name__)
+    compress.init_app(app)
+    return app
+
+app = start_app()
 
 html_escape_table = {
     "&": "&amp;",
@@ -471,6 +482,18 @@ def editGlobalMSG():
         return render_template("editGlobalMSG.html", adminEmail=getAdminEmail(), fstate=globalMSGDef['enabled'], fcategory=globalMSGDef['category'], fmessage=globalMSGDef['message'])
     else:
         return redirect(url_for('logout'))
+
+#Github Webhook Push Event
+@app.route("/github-update", methods=["POST"])
+def github_update():
+    app_config = file_get_contents("config.json")
+    app_config = json.loads(app_config)
+    h = hmac.new(str(app_config["githubWebhookSecret"]), request.get_data(), hashlib.sha1)
+    if h.hexdigest() != request.headers.get("X-Hub-Signature", "")[5:]:  # A timing attack here is nearly impossible.
+        return "FAIL"
+    try:
+        subprocess.Popen("updatenrgrecords", shell=True)
+    return "OK"
 
 if __name__ == "__main__":
     app_config = file_get_contents("config.json")
