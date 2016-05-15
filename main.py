@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
 from werkzeug import secure_filename
 from flask_oauth import OAuth
 import os
@@ -7,8 +7,12 @@ import csv
 import json
 import xlrd
 import time
+<<<<<<< HEAD
 import hmac
 import hashlib
+=======
+import re
+>>>>>>> origin/master
 from shutil import move
 from flask.ext.compress import Compress
 
@@ -44,6 +48,14 @@ def randBG():
              for filename in files
              if not filename.endswith(".bak")]
     return random.choice(files)[len(filepath)+1:]
+
+def remove_extra_spaces(data):
+    p = re.compile(r'\s+')
+    return p.sub(' ', data)
+
+def remove_html_tags(data):
+    p = re.compile(r'<.*?>')
+    return remove_extra_spaces(p.sub('', data))
 
 def getAttendancePanelContent():
     return file_get_contents("panelContent/attendancePanel.txt")
@@ -115,7 +127,10 @@ def jsonifyLN():
 
 @app.route("/")
 def index():
-    oldRef = request.args.get('oldRef', None)
+    try:
+        oldRef = remove_html_tags(request.args.get('oldRef', None))
+    except:
+        oldRef = None
     if not oldRef == None:
         flash(u'''It appears that you have been redirected from our old domain (''' + oldRef + '''). Please update your bookmarks to the new domain (<a href="http://nrgRecords.cf/">http://nrgRecords.cf/</a>). Thanks!''', 'warning')
     flashcfg = file_get_contents("globalHeaderMSG.json")
