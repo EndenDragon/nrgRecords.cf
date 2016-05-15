@@ -506,7 +506,7 @@ def github_update():
     if h.hexdigest() != request.headers.get("X-Hub-Signature", "")[5:]:  # A timing attack here is nearly impossible.
         return "FAIL"
     try:
-        subprocess.Popen("updatenrgrecords", shell=True)
+        subprocess.call('updatenrgrecords', shell=True)
     except Exception as e:
         print e
         return "ERROR", 500
