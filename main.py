@@ -17,6 +17,7 @@ compress = Compress()
 
 def start_app():
     app = Flask(__name__)
+    app.config['COMPRESS_MIMETYPES'] = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript', "image/png", "image/jpeg"]
     compress.init_app(app)
     return app
 
