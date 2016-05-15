@@ -4,6 +4,5 @@
   "debug": "True",
   "log": "file.log",
   "gClientID": "GOOGLE OAUTH CLIENT ID",
-  "gClientSecret": "GOOGLE OAUTH CLIENT SECRET",
-  "githubWebhookSecret": "SECRET"
+  "gClientSecret": "GOOGLE OAUTH CLIENT SECRET"
 }
