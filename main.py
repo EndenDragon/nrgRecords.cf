@@ -506,8 +506,9 @@ def github_update():
         return "FAIL"
     try:
         subprocess.Popen("updatenrgrecords", shell=True)
-    except:
-        return "ERROR"
+    except Exception as e:
+        print e
+        return "ERROR", 500
     return "OK"
 
 if __name__ == "__main__":
