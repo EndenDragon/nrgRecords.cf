@@ -7,12 +7,9 @@ import csv
 import json
 import xlrd
 import time
-<<<<<<< HEAD
 import hmac
 import hashlib
-=======
 import re
->>>>>>> origin/master
 from shutil import move
 from flask.ext.compress import Compress
 
