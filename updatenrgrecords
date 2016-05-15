@@ -2,9 +2,7 @@
 # Insert the file in the /usr/bin folder and type “updatenrgrecords”,
 # To run the script of updating the website from the git
 
-sleep 3
 echo updatenrgrecords: Updating NRG Records Site
-sleep 3
 cd /home/ubuntu/nrgRecords.cf
 echo updatenrgrecords: Stopping gunicorn process
 sudo service gunicorn stop
