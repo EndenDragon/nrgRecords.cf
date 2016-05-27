@@ -500,6 +500,7 @@ def editGlobalMSG():
     else:
         return redirect(url_for('logout'))
 
+# Github Webhook - Auto Update site for deployment
 @app.route("/github-update", methods=["POST"])
 def github_update():
     app_config = file_get_contents("config.json")
