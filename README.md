@@ -4,7 +4,7 @@
 
 Newport Robotics Group (NRG948) Records Site
 
-The site's purpose is to quickly look up one's attendance and outreach hours. Built onto the Flask microframework above python, it provides a great base to create a simple website. The deployed server uses wsgi gunicorn to create workers (3) to divide up the work and speed up the page loads.
+The site's purpose is to quickly look up one's attendance and outreach hours. Built onto the Flask microframework above python, it provides a great base to create a simple website. The deployed server is located on [PythonAnywhere](http://pythonanywhere.com/) using two web workers to speed up the content delivery.
 
 Make any changes/fixes that are needed and submit a pull-request! Thank you for your contribution! :)
 
