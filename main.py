@@ -12,8 +12,12 @@ import hashlib
 import re
 from shutil import move
 from flask.ext.compress import Compress
+import hmac
+import hashlib
+import subprocess
 
 compress = Compress()
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 def start_app():
     app = Flask(__name__)
@@ -495,6 +499,19 @@ def editGlobalMSG():
         return render_template("editGlobalMSG.html", adminEmail=getAdminEmail(), fstate=globalMSGDef['enabled'], fcategory=globalMSGDef['category'], fmessage=globalMSGDef['message'])
     else:
         return redirect(url_for('logout'))
+
+@app.route("/github-update", methods=["POST"])
+def github_update():
+    app_config = file_get_contents("config.json")
+    app_config = json.loads(app_config)
+    h = hmac.new(str(app_config["githubWebhookSecret"]), request.data, hashlib.sha1)
+    if h.hexdigest() != request.headers.get("X-Hub-Signature", "")[5:]:  # A timing attack here is nearly impossible.
+        return "FAIL"
+    try:
+        subprocess.Popen("git pull", shell=True).wait()
+    except OSError:
+        return "ERROR"
+    return "OK"
 
 if __name__ == "__main__":
     app_config = file_get_contents("config.json")
