@@ -15,6 +15,7 @@ from flask.ext.compress import Compress
 import hmac
 import hashlib
 import subprocess
+from flask_sslify import SSLify
 
 compress = Compress()
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -23,6 +24,7 @@ def start_app():
     app = Flask(__name__)
     app.config['COMPRESS_MIMETYPES'] = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript', "image/png", "image/jpeg"]
     compress.init_app(app)
+    sslify = SSLify(app, permanent=True, age=7776000)
     return app
 
 app = start_app()
