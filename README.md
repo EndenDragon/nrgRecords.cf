@@ -15,6 +15,7 @@ Make any changes/fixes that are needed and submit a pull-request! Thank you for 
 * flask_oauth
 * xlrd
 * flask-compress
+* Flask-SSLify
 
 ## Files
 
