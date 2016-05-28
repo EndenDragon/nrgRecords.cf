@@ -235,13 +235,13 @@ def record():
 ### DOWNLOAD CSVS ###
 @app.route('/csv/<filename>')
 def download_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'],
+    return send_from_directory(app.config['CSV_UPLOAD_FOLDER'],
                                filename, as_attachment=True)
 
 ### ADMIN PANEL ###
-UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__)) + "/" + "csv"
+CSV_UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__)) + "/" + "csv"
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx', 'xls'])
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['CSV_UPLOAD_FOLDER'] = CSV_UPLOAD_FOLDER
 
 app_config = file_get_contents("config.json")
 app_config = json.loads(app_config)
@@ -373,7 +373,7 @@ def uploadAttendance():
             afile = request.files['file']
             if afile and allowed_file(afile.filename):
                 filename = secure_filename(afile.filename)
-                afile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                afile.save(os.path.join(app.config['CSV_UPLOAD_FOLDER'], filename))
                 if filename[len(filename)-3:] == "csv":
                     move(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + filename, os.path.dirname(os.path.realpath(__file__)) + "/csv/nrgAttendance.csv")
                     flash(u'Successfully uploaded a CSV file!', 'success')
@@ -408,7 +408,7 @@ def uploadOutreach():
             afile = request.files['file']
             if afile and allowed_file(afile.filename):
                 filename = secure_filename(afile.filename)
-                afile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                afile.save(os.path.join(app.config['CSV_UPLOAD_FOLDER'], filename))
                 if filename[len(filename)-3:] == "csv":
                     move(os.path.dirname(os.path.realpath(__file__)) + "/csv/" + filename, os.path.dirname(os.path.realpath(__file__)) + "/csv/nrgOutreach.csv")
                     flash(u'Successfully uploaded a CSV file!', 'success')
