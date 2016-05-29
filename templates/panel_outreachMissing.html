@@ -10,9 +10,10 @@
                 <span class="input-group-addon" id="sizing-addon1"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></span>
                 <input type="text" class="form-control" placeholder="First Name" aria-describedby="sizing-addon1" name="fn" id="fn" data-provide="typeahead" autocomplete="off" required>
                 <input type="text" class="form-control" placeholder="Last Name" aria-describedby="sizing-addon1" name="ln" id="ln" data-provide="typeahead" autocomplete="off" required>
-                <span class="input-group-addon">
+                <span class="input-group-addon hidden-xs">
                     <button class="btn btn-default btn-large" type="button submit" value="Submit">Submit <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
                 </span>
+                <button class="btn btn-primary btn-large visible-xs" type="button submit" value="Submit" style="display: block; width: 100%;">Submit <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
             </div>
         </div>
             <div class="well well-sm" style="color: #333;">
@@ -23,9 +24,9 @@
                 <!-- Responsive calendar - START -->
                   <div class="responsive-calendar" style="color: black;">
                   <div class="controls">
-                      <a class="pull-left" data-go="prev"><div class="btn btn-primary btn-lg">Prev</div></a>
-                      <h4><span data-head-month></span> <span data-head-year></span></h4>
-                      <a class="pull-right" data-go="next"><div class="btn btn-primary btn-lg">Next</div></a>
+                    <a class="pull-left" data-go="prev"><div class="btn btn-primary btn-lg hidden-xs">Prev</div><div class="btn btn-primary btn-sm visible-xs">Prev</div></a>
+                    <a class="pull-right" data-go="next"><div class="btn btn-primary btn-lg hidden-xs">Next</div><div class="btn btn-primary btn-sm visible-xs">Prev</div></a>
+                    <h4><span data-head-month></span> <span data-head-year></span></h4>
                   </div><hr/>
                   <div class="day-headers">
                     <div class="day header">Sun</div>
