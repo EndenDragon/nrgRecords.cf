@@ -24,7 +24,7 @@ def start_app():
     app = Flask(__name__)
     app.config['COMPRESS_MIMETYPES'] = ['text/html', 'text/css', 'text/xml', 'application/json', 'application/javascript', "image/png", "image/jpeg"]
     compress.init_app(app)
-    sslify = SSLify(app, permanent=True, age=7776000)
+    sslify = SSLify(app, permanent=True, age=31536000)
     return app
 
 app = start_app()
